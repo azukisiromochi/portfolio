@@ -13,6 +13,17 @@ const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 
 const onwarn = (warning, onwarn) => (warning.code === 'CIRCULAR_DEPENDENCY' && /[/\\]@sapper[/\\]/.test(warning.message)) || onwarn(warning);
 
+// Using sass
+import sveltePreprocess from 'svelte-preprocess';
+const preprocess = sveltePreprocess({
+  scss: {
+    includePaths: ['src'],
+  },
+  postcss: {
+    plugins: [require('autoprefixer')],
+  },
+});
+
 export default {
 	client: {
 		input: config.client.input(),
@@ -25,7 +36,8 @@ export default {
 			svelte({
 				dev,
 				hydratable: true,
-				emitCss: true
+				emitCss: true,
+				preprocess,
 			}),
 			resolve({
 				browser: true,
@@ -68,7 +80,8 @@ export default {
 			}),
 			svelte({
 				generate: 'ssr',
-				dev
+				dev,
+				preprocess,
 			}),
 			resolve({
 				dedupe: ['svelte']
